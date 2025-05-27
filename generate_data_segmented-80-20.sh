@@ -8,8 +8,8 @@
 #SBATCH --partition gpu
 #SBATCH --gres=gpu:2
 #SBATCH --partition=gpu
-#SBATCH --output=create_data_distribution.out
-#SBATCH --error=create_data_distribution.err
+#SBATCH --output=generate_data_segmented-80-20.out
+#SBATCH --error=generate_data_segmented-80-20.err
 #SBATCH --job-name=PV-dists
 #SBATCH --mail-user=shaurya.gaur@wur.nl
 #SBATCH --mail-type=ALL
