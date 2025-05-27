@@ -63,7 +63,10 @@ def distribute_buckets(BUCKETS, train_probability):
 for data_type in glob.glob(INPUT_FOLDER +"/*"):
 	
 	data_type_name = data_type.split("/")[-1]	
-	print data_type_name
+	print(data_type_name)
+
+	if data_type_name != 'segmented':
+		continue
 
 	BUCKETS = {}
 	all_images = glob.glob(data_type+"/*/*")
@@ -75,49 +78,49 @@ for data_type in glob.glob(INPUT_FOLDER +"/*"):
 		image_identifier = image_identifier.split("___")[-1]	
 		image_identifier = image_identifier.split("copy")[0].replace(".jpg", "").replace(".JPG","").replace(".png","").replace(".PNG", "")
 
-		#print "\"",image_identifier,"\"", className			
-		#print image_name, "======================>", determine_leaf_group(image_identifier, className)
+		#print("\"",image_identifier,"\"", className)			
+		#print(image_name, "======================>", determine_leaf_group(image_identifier, className))
 		group = determine_leaf_group(image_identifier, className)
 		try:
 			BUCKETS[group].append((_img, className))
 		except:
 			BUCKETS[group] = [(_img, className)]
 	
-	train_probs = [0.2, 0.4, 0.5, 0.6, 0.8]
+	train_probs = [0.8]
 	for train_prob in train_probs:	
 		CANDIDATE_DISTRIBUTIONS = []
 		CANDIDATE_VARIANCES = []
 		for k in range(1000):
-			#print "======================="
-			#print "K ::",k
+			#print("=======================")
+			#print("K ::",k)
 			train, test = distribute_buckets(BUCKETS, train_prob)
 			train_dist = compute_per_class_distribution(train) 
 			test_dist =  compute_per_class_distribution(test) 
 			spread_data = []
 			for _key in train_dist:
-				#print _key, train_dist[_key] * 1.0 /(train_dist[_key]+test_dist[_key])
+				#print(_key, train_dist[_key] * 1.0 /(train_dist[_key]+test_dist[_key]))
 				spread_data.append(train_dist[_key] * 1.0 /(train_dist[_key]+test_dist[_key]))
 
 			CANDIDATE_DISTRIBUTIONS.append((train, test))
 			CANDIDATE_VARIANCES.append(np.var(spread_data))
 
-			#print "Train : ", len(train)
-			#print "Test : ", len(test)
+			#print("Train : ", len(train))
+			#print("Test : ", len(test))
 
 
 		train, test = CANDIDATE_DISTRIBUTIONS[np.argmax(CANDIDATE_VARIANCES)]
-		print len(train)
-		print len(test)
+		print(len(train))
+		print(len(test))
 		
 		train_dist = compute_per_class_distribution(train)
 		test_dist =  compute_per_class_distribution(test)
 		spread_data = []
 		for _key in train_dist:
-			print _key, train_dist[_key] * 1.0 /(train_dist[_key]+test_dist[_key])
+			print(_key, train_dist[_key] * 1.0 /(train_dist[_key]+test_dist[_key]))
 			spread_data.append(train_dist[_key] * 1.0 /(train_dist[_key]+test_dist[_key]))
 
-		print "Mean :: ", np.mean(spread_data)
-		print "Variance: ", np.var(spread_data)
+		print("Mean :: ", np.mean(spread_data))
+		print("Variance: ", np.var(spread_data))
 		
 		target_folder_name = data_type_name + "-" + str(int(math.ceil(train_prob*100)))+"-"+str(int(math.ceil((1-train_prob)*100)))
 
@@ -132,7 +135,7 @@ for data_type in glob.glob(INPUT_FOLDER +"/*"):
 				labels_map[_entry[1]] += 1
 			except:
 				labels_map[_entry[1]] = 1
-		print labels_map
+		print(labels_map)
 		labels_list = sorted(labels_map.keys())
 
 		f = open(OUTPUT_FOLDER+"/"+target_folder_name+"/train.txt","w")
